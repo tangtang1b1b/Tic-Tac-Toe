@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body,html{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;margin: 0;
+      cursor: none;
+    }
+    .OOXX{
+      opacity: 0;
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+    }
+    .OOXXImg{
+      width: 100%;
+      height: 100%;
+    }
+    h1{
+      margin-bottom: 50px;
+      border: dashed 4px #333;
+      padding: 10px 20px;
+    }
+    .container{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .board{
+      display: flex;
+      flex-wrap: wrap;
+      width: 450px;
+      height: 450px;
+    }
+    .restart{
+      margin-top: 50px;
+      position: relative;
+      border: 0;
+      background: #0597ff;
+      padding: 1.25em 1.5em;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .restart::before{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0ea5e9;
+      border-radius: inherit;
+      transform: translate3d(0, 0.4em, -1em);
+    }
+    .restart::after{
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      filter: blur(4px);
+      border-radius: inherit;
+      top: 0;
+      left: 0;
+      transform: translate3d(0, .6em, -1em);
+
+    }
+    .checkBox{
+      width: 150px;
+      height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: solid 2px #333;
+      box-sizing: border-box;
+      color: transparent;
+    }
+    .checkBox:hover{
+      background-color: rgba(14, 165, 233, 0.5);
+      box-shadow: 0px 0px 7px 5px rgba(14, 165, 233, 0.5);
+    }
+    .checkBox:nth-child(-n+3){
+      border-top: none;
+    }
+    .checkBox:nth-child(n+7){
+      border-bottom: none;
+    }
+    .checkBox:nth-child(3n+1){
+      border-left: none;
+    }
+    .checkBox:nth-child(3n){
+      border-right: none;
+    }
+    .image{
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="OOXX"><img class="OOXXImg" src="img/OO.png"></div>
+  <div class="container">
+    <h1>～井字遊戲～</h1>
+    <div class="board"></div>
+    <div class="restart">重新開始</div>
+  </div>
+
+  <script>
+    // 012, 345, 678, 036, 147, 258, 048, 246
+    let CB = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let man = 0;
+    let type,typeR;
+    let container = document.querySelector('.container');
+    let OOXX = document.querySelector('.OOXX');
+    let OOXXImg = document.querySelector('.OOXX .OOXXImg');
+    let board = document.querySelector('.board');
+    let restart = document.querySelector('.restart');
+
+    start();
+
+    // 跟隨滑鼠
+    container.addEventListener('mousemove',(e) => {
+      OOXX.style.opacity = '1';
+      OOXX.style.top = `${e.pageY}px`;
+      OOXX.style.left = `${e.pageX}px`;
+    })
+    // 重新開始
+    restart.addEventListener('click',() => {
+      start();
+    })
+    // 渲染棋盤
+    function start(){
+      CB = CB.map((a) => a = 0);
+      board.innerHTML = '';
+      for(let i = 0 ; i < CB.length ; i++){
+        let checkerBox = document.createElement('div');
+        let img = document.createElement('img');
+        img.className = 'image';
+        checkerBox.addEventListener('click',(e) => {
+          if(CB[i] != 0){
+            alert('作弊bad');
+            return 
+          }
+          type = man % 2 === 0 ? 'img/OO.png' : 'img/XX.png';
+          typeR = man % 2 !== 0 ? 'img/OO.png' : 'img/XX.png';
+          OOXXImg.src = typeR;
+          img.src = type;
+          setTimeout(() => {
+            img.style.opacity = '1';
+          }, 90);
+          if(man % 2 === 0){
+            CB[e.target.innerText] = 1;
+          }else{
+            CB[e.target.innerText] = 2;
+          }
+          checkerBox.appendChild(img);
+          man++;
+
+          check(0,1,2);
+          check(3,4,5);
+          check(6,7,8);
+          check(0,3,6);
+          check(1,4,7);
+          check(2,5,8);
+          check(0,4,8);
+          check(2,4,6);
+        })
+        checkerBox.className = 'checkBox';
+        checkerBox.textContent = i;
+        board.appendChild(checkerBox);
+      }
+    }
+    // 檢查結果
+    function check(a, b, c){
+      if(CB[a] == CB[b] && CB[b] == CB[c] && CB[a] != 0 && CB[b] != 0 && CB[c] != 0){
+        setTimeout(() => {
+          alert('GG囉');
+          start();
+        }, 150);
+      }
+    }
+
+  </script>
+</body>
+</html>
